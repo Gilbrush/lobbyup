@@ -9,7 +9,7 @@ $platform_id = isset($_GET['platform_id']) ? cleanInput($_GET['platform_id']) : 
 $date = isset($_GET['date']) ? cleanInput($_GET['date']) : null;
 
 // Costruisci query
-$sql = "SELECT s.*, g.name AS game_name, p.name AS platform_name, u.username AS creator_name 
+$sql = "SELECT s.*, g.name AS game_name, g.cover_image, p.name AS platform_name, p.logo_url AS platform_logo, u.username AS creator_name 
         FROM sessions s 
         JOIN games g ON s.game_id = g.id 
         JOIN platforms p ON s.platform_id = p.id 
@@ -24,6 +24,12 @@ if ($platform_id) {
 }
 if ($date) {
     $sql .= " AND s.session_date = '$date'";
+}
+
+// Filtro ricerca testuale
+$q = isset($_GET['q']) ? cleanInput($_GET['q']) : null;
+if ($q) {
+    $sql .= " AND (g.name LIKE '%$q%' OR p.name LIKE '%$q%' OR s.description LIKE '%$q%')";
 }
 
 $sql .= " ORDER BY s.session_date ASC, s.start_time ASC LIMIT 20";
