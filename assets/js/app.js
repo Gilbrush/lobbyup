@@ -38,8 +38,15 @@ function updateAuthUI() {
     if (authLinks) {
         if (user) {
             authLinks.innerHTML = `
-                <span style="margin-right: 15px;">Ciao, ${user.username}</span>
-                <button class="btn" onclick="logout()">Logout</button>
+                <div class="user-menu">
+                    <img src="${user.avatar_url || 'assets/images/default-avatar.png'}" alt="Avatar" class="user-avatar">
+                    <span>${user.username}</span>
+                    <div class="dropdown-content">
+                        <a href="profile.php">👤 Profilo</a>
+                        <a href="settings.php">⚙️ Impostazioni</a>
+                        <a href="#" onclick="logout()">🚪 Logout</a>
+                    </div>
+                </div>
             `;
         } else {
             authLinks.innerHTML = `
@@ -74,7 +81,7 @@ async function loadFeaturedSessions() {
 function createSessionCard(session) {
     // Fallback images
     const coverImage = session.cover_image || 'assets/images/default-game.jpg';
-    const platformLogo = session.platform_logo || 'assets/images/default-platform.png'; // Ora i loghi sono nel DB, ma il JOIN deve prenderli
+    const platformLogo = session.platform_logo || 'assets/images/default-platform.png';
 
     // Gestione date
     const date = new Date(session.session_date + 'T' + session.start_time);
@@ -95,14 +102,50 @@ function createSessionCard(session) {
                     <span class="players">👥 ${session.current_players}/${session.max_players}</span>
                 </div>
                 <div class="host">
-                    <small>Host: ${session.creator_name}</small>
+                    <small onclick="showHostInfo('${session.creator_name}')" style="cursor: pointer; text-decoration: underline;">Host: ${session.creator_name}</small>
                 </div>
             </div>
             <div class="card-footer">
-                <button class="btn full-width" onclick="joinSession(${session.id})">Unisciti</button>
+                <button class="btn full-width" onclick='openSessionModal(${JSON.stringify(session)})'>Unisciti</button>
             </div>
         </div>
     `;
+}
+
+// Modal Logic
+function openSessionModal(session) {
+    const modal = document.getElementById('session-modal');
+    const title = document.getElementById('modal-title');
+    const body = document.getElementById('modal-body');
+    const joinBtn = document.getElementById('modal-join-btn');
+
+    title.innerText = `Unisciti a ${session.game_name}`;
+    body.innerHTML = `
+        <p><strong>Piattaforma:</strong> ${session.platform_name}</p>
+        <p><strong>Host:</strong> ${session.creator_name}</p>
+        <p><strong>Descrizione:</strong> ${session.description}</p>
+        <p><strong>Data:</strong> ${session.session_date} alle ${session.start_time}</p>
+        <p><strong>Giocatori:</strong> ${session.current_players}/${session.max_players}</p>
+    `;
+    
+    joinBtn.onclick = () => alert('Funzionalità Unisciti in arrivo! (Richiede Auth Backend)');
+    
+    modal.style.display = "block";
+
+    // Close modal logic
+    document.querySelector('.close-modal').onclick = () => {
+        modal.style.display = "none";
+    }
+    
+    window.onclick = (event) => {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+}
+
+function showHostInfo(hostName) {
+    alert(`Profilo di ${hostName} in arrivo!`);
 }
 
 // Gestione Login Form

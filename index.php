@@ -14,7 +14,12 @@ require_once 'config/db.php';
 <body>
 
     <header class="container">
-        <div class="logo"><a href="index.php" style="color: inherit; text-decoration: none;">LobbyUp</a></div>
+        <div class="logo">
+            <a href="index.php">
+                <div class="logo-icon">🎮</div>
+                LobbyUp
+            </a>
+        </div>
         <nav>
             <ul>
                 <li><a href="search.php">Cerca Sessioni</a></li>
@@ -27,6 +32,14 @@ require_once 'config/db.php';
     </header>
 
     <section class="hero container">
+        <div class="floating-icons">
+            <span class="float-icon" style="left: 10%; animation-duration: 15s; animation-delay: 0s;">🎮</span>
+            <span class="float-icon" style="left: 30%; animation-duration: 18s; animation-delay: 2s;">👾</span>
+            <span class="float-icon" style="left: 70%; animation-duration: 20s; animation-delay: 5s;">🕹️</span>
+            <span class="float-icon" style="left: 90%; animation-duration: 12s; animation-delay: 1s;">🎲</span>
+            <span class="float-icon" style="left: 50%; animation-duration: 25s; animation-delay: 7s;">🎧</span>
+        </div>
+
         <h1>Trova il tuo party. <br> Gioca meglio.</h1>
         <p>Unisciti a migliaia di giocatori, crea la tua sessione e domina il gioco.</p>
         
@@ -35,6 +48,20 @@ require_once 'config/db.php';
             <button type="submit" class="btn">Cerca</button>
         </form>
     </section>
+
+    <!-- Modal Dettaglio Sessione -->
+    <div id="session-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modal-title">Dettagli Sessione</h2>
+            <div id="modal-body">
+                <!-- Contenuto dinamico -->
+            </div>
+            <div class="modal-footer" style="margin-top: 20px; text-align: right;">
+                <button class="btn" id="modal-join-btn">Conferma Partecipazione</button>
+            </div>
+        </div>
+    </div>
 
     <section class="container">
         <h2>Sessioni in Evidenza</h2>

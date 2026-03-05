@@ -30,7 +30,7 @@ require_once 'config/db.php';
     <div class="container">
         <h2>Risultati Ricerca</h2>
         <div class="search-bar" style="margin-bottom: 30px; justify-content: flex-start;">
-            <input type="text" id="search-input" placeholder="Filtra per gioco o piattaforma..." value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q']) : ''; ?>">
+            <input type="text" id="search-input" placeholder="Filtra per gioco o piattaforma...">
             <button class="btn" id="search-btn">Cerca</button>
         </div>
 
@@ -39,17 +39,72 @@ require_once 'config/db.php';
             <p style="color: #888;">Caricamento sessioni...</p>
         </div>
     </div>
+    
+    <!-- Modal Dettaglio Sessione -->
+    <div id="session-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modal-title">Dettagli Sessione</h2>
+            <div id="modal-body">
+                <!-- Contenuto dinamico -->
+            </div>
+            <div class="modal-footer" style="margin-top: 20px; text-align: right;">
+                <button class="btn" id="modal-join-btn">Conferma Partecipazione</button>
+            </div>
+        </div>
+    </div>
 
     <script src="assets/js/app.js"></script>
-    <script>
+        <script>
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const query = urlParams.get('q');
-            if (query) {
-                // Esegui ricerca
-                console.log('Searching for:', query);
-                // Qui chiameremmo l'API reale
+            
+            // Gestione Search Page Logic
+            const searchInput = document.getElementById('search-input');
+            const searchBtn = document.getElementById('search-btn');
+            const container = document.getElementById('search-results');
+            
+            function performSearch(q) {
+                container.innerHTML = '<p>Ricerca in corso...</p>';
+                
+                let endpoint = 'sessions/search.php';
+                if (q) endpoint += `?q=${encodeURIComponent(q)}`;
+                
+                apiCall(endpoint).then(res => {
+                    if (res.success && res.data.length > 0) {
+                        container.innerHTML = res.data.map(session => createSessionCard(session)).join('');
+                    } else {
+                        container.innerHTML = '<p>Nessuna sessione trovata per la tua ricerca.</p>';
+                    }
+                });
             }
+
+            if (query) {
+                searchInput.value = query;
+                performSearch(query);
+            } else {
+                performSearch(''); // Carica tutto se non c'è query
+            }
+            
+            function handleSearch() {
+                const newQuery = searchInput.value;
+                const newUrl = new URL(window.location);
+                if (newQuery) {
+                    newUrl.searchParams.set('q', newQuery);
+                } else {
+                    newUrl.searchParams.delete('q');
+                }
+                window.history.pushState({}, '', newUrl);
+                performSearch(newQuery);
+            }
+
+            searchBtn.addEventListener('click', handleSearch);
+            
+            // Enter key support
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleSearch();
+            });
         });
     </script>
 </body>
