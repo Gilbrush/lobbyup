@@ -30,6 +30,32 @@ async function apiCall(endpoint, method = 'GET', data = null) {
     }
 }
 
+// User Menu Toggle
+function toggleUserMenu() {
+    const dropdown = document.querySelector('.dropdown-content');
+    if (dropdown) {
+        dropdown.classList.toggle('show');
+    }
+}
+
+// Close dropdown when clicking outside
+window.onclick = function(event) {
+    if (!event.target.matches('.user-menu') && !event.target.matches('.user-menu *')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        for (var i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
+    // Close modal
+    const modal = document.getElementById('session-modal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
 // Gestione UI Autenticazione
 function updateAuthUI() {
     const authLinks = document.getElementById('auth-links');
@@ -38,7 +64,7 @@ function updateAuthUI() {
     if (authLinks) {
         if (user) {
             authLinks.innerHTML = `
-                <div class="user-menu">
+                <div class="user-menu" onclick="toggleUserMenu()">
                     <img src="${user.avatar_url || 'assets/images/default-avatar.png'}" alt="Avatar" class="user-avatar">
                     <span>${user.username}</span>
                     <div class="dropdown-content">
@@ -95,7 +121,7 @@ function createSessionCard(session) {
                 <span class="badge">${session.platform_name}</span>
             </div>
             <div class="card-body">
-                <h3>${session.game_name}</h3>
+                <h3 onclick="openGameDetails(${session.game_id})" style="cursor: pointer; text-decoration: underline;">${session.game_name}</h3>
                 <p class="desc">${session.description || 'Nessuna descrizione.'}</p>
                 <div class="meta">
                     <span class="date">📅 ${dateStr} - ${timeStr}</span>
@@ -106,10 +132,40 @@ function createSessionCard(session) {
                 </div>
             </div>
             <div class="card-footer">
-                <button class="btn full-width" onclick='openSessionModal(${JSON.stringify(session)})'>Unisciti</button>
+                <button class="join-btn" onclick='openSessionModal(${JSON.stringify(session)})'>UNISCITI</button>
             </div>
         </div>
     `;
+}
+
+// Open Game Details Modal
+async function openGameDetails(gameId) {
+    const modal = document.getElementById('session-modal'); // Riutilizziamo lo stesso modal per semplicità
+    const body = document.getElementById('modal-body');
+    
+    // Mostra loading
+    modal.style.display = "block";
+    body.innerHTML = "<p>Caricamento dettagli gioco...</p>";
+    document.getElementById('modal-title').innerText = "Dettagli Gioco";
+    document.getElementById('modal-join-btn').style.display = 'none';
+
+    // Mock API call (in produzione chiameremmo /api/games/details.php)
+    // Qui simuliamo i dati recuperando info dalla sessione o facendo una chiamata search
+    const res = await apiCall(`games/search.php?query=&id=${gameId}`); // Assumiamo che search supporti id o filtriamo
+    
+    // Per ora usiamo dati statici simulati basati su ID per demo
+    body.innerHTML = `
+        <div class="game-details">
+            <p>Dettagli completi del gioco #${gameId} in arrivo.</p>
+            <p>Qui verranno mostrati: Trailer, Screenshot, Descrizione lunga e altre sessioni attive.</p>
+        </div>
+    `;
+    
+    // Close modal logic
+    document.querySelector('.close-modal').onclick = () => {
+        modal.style.display = "none";
+        document.getElementById('modal-join-btn').style.display = 'inline-block'; // Reset
+    }
 }
 
 // Modal Logic
@@ -119,15 +175,30 @@ function openSessionModal(session) {
     const body = document.getElementById('modal-body');
     const joinBtn = document.getElementById('modal-join-btn');
 
-    title.innerText = `Unisciti a ${session.game_name}`;
+    // Fallback images
+    const coverImage = session.cover_image || 'assets/images/default-game.jpg';
+
+    // Pulisci titolo modal base
+    title.innerText = "";
+    
+    // Header personalizzato con immagine gioco
     body.innerHTML = `
-        <p><strong>Piattaforma:</strong> ${session.platform_name}</p>
-        <p><strong>Host:</strong> ${session.creator_name}</p>
-        <p><strong>Descrizione:</strong> ${session.description}</p>
-        <p><strong>Data:</strong> ${session.session_date} alle ${session.start_time}</p>
-        <p><strong>Giocatori:</strong> ${session.current_players}/${session.max_players}</p>
+        <div class="game-modal-header" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.9)), url('${coverImage}');">
+            <div class="game-title-overlay">
+                <h2 style="margin:0; font-size: 1.8rem;">${session.game_name}</h2>
+                <div style="margin-top:5px;"><span class="badge">${session.platform_name}</span></div>
+            </div>
+        </div>
+        <div style="padding: 10px;">
+            <p><strong>Host:</strong> ${session.creator_name}</p>
+            <p><strong>Descrizione:</strong> ${session.description}</p>
+            <p><strong>Data:</strong> ${session.session_date} alle ${session.start_time}</p>
+            <p><strong>Giocatori:</strong> ${session.current_players}/${session.max_players}</p>
+        </div>
     `;
     
+    joinBtn.style.display = 'block';
+    joinBtn.innerText = "CONFERMA PARTECIPAZIONE";
     joinBtn.onclick = () => alert('Funzionalità Unisciti in arrivo! (Richiede Auth Backend)');
     
     modal.style.display = "block";
@@ -136,16 +207,6 @@ function openSessionModal(session) {
     document.querySelector('.close-modal').onclick = () => {
         modal.style.display = "none";
     }
-    
-    window.onclick = (event) => {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
-}
-
-function showHostInfo(hostName) {
-    alert(`Profilo di ${hostName} in arrivo!`);
 }
 
 // Gestione Login Form

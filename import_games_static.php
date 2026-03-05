@@ -124,12 +124,20 @@ $games = [
         "genres" => "Sports"
     ],
     [
-        "name" => "Valorant",
-        "slug" => "valorant",
-        "background_image" => "https://media.rawg.io/media/games/b11/b115b2bc6a5957a917bc7601f4abdda2.jpg",
-        "rating" => 3.8,
-        "released" => "2020-06-02",
-        "genres" => "Action, Shooter"
+        "name" => "Super Mario Odyssey",
+        "slug" => "super-mario-odyssey",
+        "background_image" => "https://media.rawg.io/media/games/099/0993077e6826359f425893348123287f.jpg",
+        "rating" => 4.7,
+        "released" => "2017-10-27",
+        "genres" => "Platformer"
+    ],
+    [
+        "name" => "The Legend of Zelda: Breath of the Wild",
+        "slug" => "the-legend-of-zelda-breath-of-the-wild",
+        "background_image" => "https://media.rawg.io/media/games/cc1/cc196a5ad763955d6532cdba236f7a20.jpg",
+        "rating" => 4.8,
+        "released" => "2017-03-03",
+        "genres" => "Action, Adventure"
     ]
 ];
 

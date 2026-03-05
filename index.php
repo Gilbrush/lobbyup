@@ -20,7 +20,13 @@ require_once 'config/db.php';
                 LobbyUp
             </a>
         </div>
-        <nav>
+        <div class="hamburger" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <nav id="main-nav">
             <ul>
                 <li><a href="search.php">Cerca Sessioni</a></li>
                 <li><a href="servers.php">Server</a></li>
@@ -30,6 +36,12 @@ require_once 'config/db.php';
             </ul>
         </nav>
     </header>
+
+    <script>
+        function toggleMobileMenu() {
+            document.querySelector('nav ul').classList.toggle('active');
+        }
+    </script>
 
     <section class="hero container">
         <div class="floating-icons">
